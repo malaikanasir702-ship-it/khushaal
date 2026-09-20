@@ -1,0 +1,6 @@
+{
+  "name": "Khushhaal",
+  "description": "Family financial wellbeing, smart budget envelope splitting, prosperity index, fraud protection, and microenterprise income builder.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
