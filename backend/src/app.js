@@ -49,6 +49,42 @@ app.get('/api/health', (req, res) => {
   }
 });
 
+// One-time admin seed endpoint — protected by secret token
+app.post('/api/internal/seed-admin', async (req, res) => {
+  const { secret } = req.body;
+  if (secret !== 'khushhaal_seed_2025_secret') {
+    return res.status(403).json({ error: 'Forbidden' });
+  }
+  try {
+    const bcrypt = require('bcryptjs');
+    const User = require('./models/User');
+    const existing = await User.findOne({ phone: '+923001234567' });
+    if (existing) {
+      return res.json({ message: 'Admin already exists', phone: '+923001234567' });
+    }
+    const passwordHash = await bcrypt.hash('Khushhaal@Admin2025!', 12);
+    const admin = new User({
+      name: 'Khushhaal Admin',
+      urduName: 'خوشحال ایڈمن',
+      phone: '+923001234567',
+      cnic: '35201-0000001-1',
+      passwordHash,
+      factory: 'Khushhaal Head Office',
+      factoryId: 'KHQ-ADMIN-001',
+      role: 'admin',
+      isActive: true
+    });
+    await admin.save();
+    return res.status(201).json({
+      message: 'Admin created successfully!',
+      phone: '+923001234567',
+      password: 'Khushhaal@Admin2025!'
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
 // Mount routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
