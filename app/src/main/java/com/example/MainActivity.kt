@@ -19,7 +19,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import com.example.onboarding.OnboardingFlowHost
+import com.example.onboarding.OnboardingManager
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -68,6 +72,9 @@ class MainActivity : ComponentActivity() {
         val isLoggedIn by authViewModel.isLoggedIn.collectAsStateWithLifecycle()
         val authUiState by authViewModel.uiState.collectAsStateWithLifecycle()
 
+        val onboardingManager = remember { OnboardingManager(applicationContext) }
+        var onboardingCompleted by remember { mutableStateOf(onboardingManager.isCompleted()) }
+
         // When login/register succeeds, reload all data
         LaunchedEffect(isLoggedIn) {
           if (isLoggedIn) {
@@ -77,7 +84,21 @@ class MainActivity : ComponentActivity() {
           }
         }
 
-        if (isLoggedIn) {
+        if (!onboardingCompleted) {
+          OnboardingFlowHost(
+            onComplete = { data ->
+              onboardingManager.markCompleted()
+              if (data.monthlyIncome > 0L) {
+                viewModel.setOnboardingIncome(data.monthlyIncome)
+              }
+              onboardingCompleted = true
+            },
+            onLoginTapped = {
+              onboardingManager.markCompleted()
+              onboardingCompleted = true
+            }
+          )
+        } else if (isLoggedIn) {
           KhushhaalApp(viewModel = viewModel, authViewModel = authViewModel)
         } else {
           AuthFlow(authViewModel = authViewModel)

@@ -287,3 +287,7 @@ sealed class AppDestination {
   data object DebtSnowball : AppDestination()
   data object EnvelopeSplit : AppDestination()
 }
+
+data class OnboardingData(
+    val monthlyIncome: Long = 0L
+)

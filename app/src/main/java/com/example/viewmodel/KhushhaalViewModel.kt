@@ -544,6 +544,13 @@ class KhushhaalViewModel(application: Application) : AndroidViewModel(applicatio
     }
   }
 
+  // Called when onboarding completes with income > 0
+  fun setOnboardingIncome(amount: Long) {
+    if (amount > 0L) {
+      _cashFlow.update { it.copy(income = amount) }
+    }
+  }
+
   // Called after logout to reset all in-memory state
   fun resetAllState() {
     _userProfile.value = UserProfile()
