@@ -14,6 +14,8 @@ const register = async (req, res) => {
       factory, 
       factoryId, 
       jazzCashNumber, 
+      bankName,
+      bankAccountNumber,
       password, 
       preferredLanguage 
     } = req.body;
@@ -46,6 +48,8 @@ const register = async (req, res) => {
       factory,
       factoryId: factoryId || '',
       jazzCashNumber: jazzCashNumber || '',
+      bankName: bankName || '',
+      bankAccountNumber: bankAccountNumber || '',
       preferredLanguage: preferredLanguage || 'BILINGUAL'
     });
 

@@ -17,11 +17,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.data.api.UpdateProfileRequest
 import com.example.model.AppDestination
 import com.example.model.AppTab
 import com.example.ui.components.AudioPlayingBanner
@@ -39,6 +42,7 @@ import com.example.ui.screens.FactorySalarySlipScreen
 import com.example.ui.screens.FraudAcademyScreen
 import com.example.ui.screens.GoalsAndKametiScreen
 import com.example.ui.screens.HomeScreen
+import com.example.ui.screens.LoginScreen
 import com.example.ui.screens.MoneyScreen
 import com.example.ui.screens.NotificationScreen
 import com.example.ui.screens.ProfileSettingsScreen
@@ -49,6 +53,8 @@ import com.example.ui.screens.DebtSnowballScreen
 import com.example.ui.screens.UtilityBillsScreen
 import com.example.ui.screens.EnvelopeSplitScreen
 import com.example.ui.theme.KhushhaalTheme
+import com.example.viewmodel.AuthUiState
+import com.example.viewmodel.AuthViewModel
 import com.example.viewmodel.KhushhaalViewModel
 
 class MainActivity : ComponentActivity() {
@@ -58,7 +64,24 @@ class MainActivity : ComponentActivity() {
     setContent {
       KhushhaalTheme {
         val viewModel: KhushhaalViewModel = viewModel()
-        KhushhaalApp(viewModel = viewModel)
+        val authViewModel: AuthViewModel = viewModel()
+        val isLoggedIn by authViewModel.isLoggedIn.collectAsStateWithLifecycle()
+        val authUiState by authViewModel.uiState.collectAsStateWithLifecycle()
+
+        // When login/register succeeds, reload all data
+        LaunchedEffect(isLoggedIn) {
+          if (isLoggedIn) {
+            viewModel.loadAllData()
+          } else {
+            viewModel.resetAllState()
+          }
+        }
+
+        if (isLoggedIn) {
+          KhushhaalApp(viewModel = viewModel, authViewModel = authViewModel)
+        } else {
+          AuthFlow(authViewModel = authViewModel)
+        }
       }
     }
   }
@@ -67,6 +90,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun KhushhaalApp(
   viewModel: KhushhaalViewModel,
+  authViewModel: AuthViewModel,
   modifier: Modifier = Modifier,
 ) {
   val currentDestination by viewModel.currentDestination.collectAsStateWithLifecycle()
@@ -102,6 +126,11 @@ fun KhushhaalApp(
   val rationEstimates by viewModel.rationEstimates.collectAsStateWithLifecycle()
   val utilityBills by viewModel.utilityBills.collectAsStateWithLifecycle()
   val debts by viewModel.debts.collectAsStateWithLifecycle()
+
+  // Company-configured dynamic content
+  val appConfigFactoryName by viewModel.appConfigFactoryName.collectAsStateWithLifecycle()
+  val appConfigHelpline by viewModel.appConfigHelpline.collectAsStateWithLifecycle()
+  val appConfigHelplineLabel by viewModel.appConfigHelplineLabel.collectAsStateWithLifecycle()
 
   // Hardware/System back button handling
   BackHandler(enabled = currentDestination != AppDestination.TabView) {
@@ -309,6 +338,17 @@ fun KhushhaalApp(
             onBack = { viewModel.navigateBack() },
             onShowToast = { msg -> viewModel.showToast(msg) },
             onPlayVoice = { c, s -> viewModel.playVoice(c, s) },
+            onLogout = {
+              authViewModel.logout {
+                viewModel.resetAllState()
+              }
+            },
+            onUpdateProfile = { req ->
+              viewModel.updateProfile(req)
+            },
+            factoryName = appConfigFactoryName,
+            welfareHelpline = appConfigHelpline,
+            welfareHelplineLabel = appConfigHelplineLabel,
             onNavigateToDestination = { dest -> viewModel.navigateTo(dest) }
           )
         }
@@ -430,3 +470,37 @@ fun KhushhaalApp(
   )
 }
 
+
+@Composable
+fun AuthFlow(
+  authViewModel: AuthViewModel,
+  modifier: Modifier = Modifier
+) {
+  var showRegister by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+
+  if (showRegister) {
+    com.example.ui.screens.RegistrationScreen(
+      authViewModel = authViewModel,
+      onNavigateToLogin = {
+        authViewModel.resetState()
+        showRegister = false
+      },
+      onRegisterSuccess = {
+        // isLoggedIn flow handles the transition automatically
+      },
+      modifier = modifier
+    )
+  } else {
+    com.example.ui.screens.LoginScreen(
+      authViewModel = authViewModel,
+      onNavigateToRegister = {
+        authViewModel.resetState()
+        showRegister = true
+      },
+      onLoginSuccess = {
+        // isLoggedIn flow handles the transition automatically
+      },
+      modifier = modifier
+    )
+  }
+}

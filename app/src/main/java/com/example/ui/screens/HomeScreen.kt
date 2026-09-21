@@ -228,9 +228,10 @@ fun HomeScreen(
                 .clip(CircleShape)
                 .background(AmberBrand)
                 .clickable {
+                  val userName = userProfile.name.ifBlank { "Worker" }
                   onPlayVoice(
-                    "Assalam-o-Alaikum Ahmed Bhai! Aap ka prosperity score ${prosperityScore.score} hay. Is mahinay 3,000 rupay emergency fund mein lazmi shamil karein.",
-                    "Assalam-o-Alaikum Ahmed Bhai! Aap ka prosperity score ${prosperityScore.score} hay."
+                    "Assalam-o-Alaikum $userName! Aap ka prosperity score ${prosperityScore.score} hay. Maliyati tahaffuz ke liye emergency fund mein bachat karein.",
+                    "Assalam-o-Alaikum $userName! Aap ka prosperity score ${prosperityScore.score} hay."
                   )
                 }
                 .testTag("greeting_audio_btn"),

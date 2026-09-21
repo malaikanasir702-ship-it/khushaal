@@ -10,11 +10,12 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import java.util.concurrent.TimeUnit
 
-class RetrofitClient private constructor(context: Context) {
+class RetrofitClient private constructor(private val appContext: Context) {
 
-    private val tokenManager = TokenManager.getInstance(context)
+    private val tokenManager = TokenManager.getInstance(appContext)
 
-    var baseUrl: String = DEFAULT_BASE_URL
+    var baseUrl: String = appContext.getSharedPreferences("khushhaal_prefs", Context.MODE_PRIVATE)
+        .getString("api_base_url", DEFAULT_BASE_URL) ?: DEFAULT_BASE_URL
         private set
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
@@ -54,7 +55,7 @@ class RetrofitClient private constructor(context: Context) {
     }
 
     companion object {
-        // Standard Android emulator loopback to host PC
+        // Standard Android emulator loopback to host PC on port 5000
         const val DEFAULT_BASE_URL = "http://10.0.2.2:5000/"
 
         @Volatile
@@ -63,6 +64,17 @@ class RetrofitClient private constructor(context: Context) {
         fun getInstance(context: Context): RetrofitClient {
             return INSTANCE ?: synchronized(this) {
                 INSTANCE ?: RetrofitClient(context.applicationContext).also { INSTANCE = it }
+            }
+        }
+
+        fun updateBaseUrl(context: Context, newUrl: String) {
+            val formatted = if (newUrl.endsWith("/")) newUrl else "$newUrl/"
+            context.getSharedPreferences("khushhaal_prefs", Context.MODE_PRIVATE)
+                .edit()
+                .putString("api_base_url", formatted)
+                .apply()
+            synchronized(this) {
+                INSTANCE = null // Re-create client with new URL on next call
             }
         }
     }

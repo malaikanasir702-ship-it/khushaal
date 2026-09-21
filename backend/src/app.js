@@ -18,6 +18,8 @@ const lockerRoutes = require('./routes/lockerRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const coachRoutes = require('./routes/coachRoutes');
+const adminRoutes = require('./routes/adminRoutes');
+const configRoutes = require('./routes/configRoutes');
 
 const app = express();
 
@@ -51,6 +53,8 @@ app.use('/api/emergency-locker', lockerRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/coach', coachRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/config', configRoutes);
 
 // 404 handler
 app.use((req, res) => {

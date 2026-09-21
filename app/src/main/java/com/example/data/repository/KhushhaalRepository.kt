@@ -40,7 +40,12 @@ class KhushhaalRepository(
                     factoryId = dto.factoryId,
                     phoneMasked = dto.phoneMasked,
                     cnicMasked = dto.cnicMasked,
+                    rawPhone = dto.rawPhone ?: "",
+                    rawCnic = dto.rawCnic ?: "",
                     paymentAccount = dto.paymentAccount,
+                    jazzCashNumber = dto.jazzCashNumber ?: "",
+                    bankName = dto.bankName ?: "",
+                    bankAccountNumber = dto.bankAccountNumber ?: "",
                     avatarUrl = dto.avatarUrl,
                     preferredLanguage = dto.preferredLanguage
                 )
@@ -76,7 +81,12 @@ class KhushhaalRepository(
                     factoryId = dto.factoryId,
                     phoneMasked = dto.phoneMasked,
                     cnicMasked = dto.cnicMasked,
+                    rawPhone = dto.rawPhone ?: "",
+                    rawCnic = dto.rawCnic ?: "",
                     paymentAccount = dto.paymentAccount,
+                    jazzCashNumber = dto.jazzCashNumber ?: "",
+                    bankName = dto.bankName ?: "",
+                    bankAccountNumber = dto.bankAccountNumber ?: "",
                     avatarUrl = dto.avatarUrl,
                     preferredLanguage = dto.preferredLanguage
                 )
@@ -938,6 +948,12 @@ class KhushhaalRepository(
             }
         } catch (e: Exception) {
             Result.Error(0, e.localizedMessage ?: "Network error")
+        }
+    }
+
+    suspend fun clearCache() {
+        kotlinx.coroutines.withContext(Dispatchers.IO) {
+            db.clearAllTables()
         }
     }
 

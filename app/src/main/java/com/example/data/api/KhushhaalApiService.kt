@@ -11,6 +11,10 @@ import retrofit2.http.Query
 
 interface KhushhaalApiService {
 
+    // --- App Config (company-managed, no auth required) ---
+    @GET("api/config")
+    suspend fun getAppConfig(): Response<AppConfigDto>
+
     // --- User Profile ---
     @GET("api/users/me")
     suspend fun getProfile(): Response<UserProfileDto>

@@ -46,7 +46,7 @@ import androidx.compose.ui.unit.sp
 import com.example.model.AppDestination
 import com.example.model.CashFlowData
 import com.example.model.Envelope
-import com.example.ui.components.EnvelopeSpringAllocationView
+import com.example.ui.components.SmartEnvelopeSplitLightCard
 import com.example.ui.theme.AmberBrand
 import com.example.ui.theme.AmberDark
 import com.example.ui.theme.AmberLight
@@ -265,9 +265,9 @@ fun MoneyScreen(
       }
     }
 
-    // 2. Smart Monthly Split with Spring Physics (4 Envelopes)
+    // 2. Smart Monthly Split - Clean Light Themed UI (4 Envelopes)
     item {
-      EnvelopeSpringAllocationView(
+      SmartEnvelopeSplitLightCard(
         totalSalary = cashFlow.income,
         onPlayVoice = onPlayVoice,
         onOpenFullDetail = { onNavigateToDestination(AppDestination.EnvelopeSplit) }

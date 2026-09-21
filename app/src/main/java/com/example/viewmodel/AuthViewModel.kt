@@ -30,8 +30,17 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     private val _uiState = MutableStateFlow<AuthUiState>(AuthUiState.Idle)
     val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
 
-    val isLoggedIn: Boolean
-        get() = tokenManager.hasTokens()
+    private val _isLoggedIn = MutableStateFlow(tokenManager.hasTokens())
+    val isLoggedIn: StateFlow<Boolean> = _isLoggedIn.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            tokenManager.sessionExpiredEvents.collect {
+                _isLoggedIn.value = false
+                _uiState.value = AuthUiState.Idle
+            }
+        }
+    }
 
     fun login(phone: String, pass: String) {
         if (phone.isBlank() || pass.isBlank()) {
@@ -47,6 +56,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 if (response.isSuccessful && response.body() != null) {
                     val authBody = response.body()!!
                     tokenManager.saveTokens(authBody.accessToken, authBody.refreshToken)
+                    _isLoggedIn.value = true
                     _uiState.value = AuthUiState.Success(authBody.user)
                 } else {
                     val errorMsg = parseErrorMessage(response.errorBody()?.string())
@@ -54,7 +64,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                     _uiState.value = AuthUiState.Error(errorMsg)
                 }
             } catch (e: Exception) {
-                _uiState.value = AuthUiState.Error("انٹرنیٹ سے رابطہ نہیں ہو سکا / Network connection error")
+                _uiState.value = AuthUiState.Error("انٹرنیٹ سے رابطہ نہیں ہو سکا / Network connection error: ${e.localizedMessage}")
             }
         }
     }
@@ -68,6 +78,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 if (response.isSuccessful && response.body() != null) {
                     val authBody = response.body()!!
                     tokenManager.saveTokens(authBody.accessToken, authBody.refreshToken)
+                    _isLoggedIn.value = true
                     _uiState.value = AuthUiState.Success(authBody.user)
                 } else {
                     val errorMsg = parseErrorMessage(response.errorBody()?.string())
@@ -75,12 +86,12 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                     _uiState.value = AuthUiState.Error(errorMsg)
                 }
             } catch (e: Exception) {
-                _uiState.value = AuthUiState.Error("انٹرنیٹ سے رابطہ نہیں ہو سکا / Network connection error")
+                _uiState.value = AuthUiState.Error("انٹرنیٹ سے رابطہ نہیں ہو سکا / Network connection error: ${e.localizedMessage}")
             }
         }
     }
 
-    fun logout() {
+    fun logout(onLoggedOut: (() -> Unit)? = null) {
         viewModelScope.launch {
             try {
                 val token = tokenManager.getAccessToken()
@@ -91,7 +102,12 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 // Ignore network error on logout
             } finally {
                 tokenManager.clearTokens()
+                try {
+                    com.example.data.repository.KhushhaalRepository.getInstance(getApplication()).clearCache()
+                } catch (e: Exception) {}
+                _isLoggedIn.value = false
                 _uiState.value = AuthUiState.Idle
+                onLoggedOut?.invoke()
             }
         }
     }

@@ -10,6 +10,8 @@ data class RegisterRequest(
     val factory: String,
     val factoryId: String? = null,
     val jazzCashNumber: String? = null,
+    val bankName: String? = null,
+    val bankAccountNumber: String? = null,
     val password: String,
     val preferredLanguage: String = "BILINGUAL"
 )
@@ -44,7 +46,12 @@ data class UserProfileDto(
     val factoryId: String = "",
     val phoneMasked: String = "",
     val cnicMasked: String = "",
+    val rawPhone: String? = null,
+    val rawCnic: String? = null,
     val paymentAccount: String = "JazzCash",
+    val jazzCashNumber: String? = null,
+    val bankName: String? = null,
+    val bankAccountNumber: String? = null,
     val avatarUrl: String = "",
     val preferredLanguage: String = "BILINGUAL"
 )
@@ -55,6 +62,8 @@ data class UpdateProfileRequest(
     val urduName: String? = null,
     val factory: String? = null,
     val jazzCashNumber: String? = null,
+    val bankName: String? = null,
+    val bankAccountNumber: String? = null,
     val preferredLanguage: String? = null,
     val avatarUrl: String? = null
 )
@@ -349,4 +358,40 @@ data class CoachMessageDto(
 data class SendMessageRequest(
     val textUrdu: String? = null,
     val textRoman: String? = null
+)
+
+// ─── App Config (fetched from /api/config) ────────────────────────────────────
+
+@JsonClass(generateAdapter = true)
+data class RationItemDto(
+    val id: String,
+    val nameUrdu: String,
+    val nameEnglish: String,
+    val category: String,
+    val defaultQty: String,
+    val unitPriceEstimate: Long,
+    val marketPriceRange: String,
+    val isEssential: Boolean = true,
+    val savingsTip: String
+)
+
+@JsonClass(generateAdapter = true)
+data class ScamSimulationDto(
+    val id: String,
+    val titleUrdu: String,
+    val titleEnglish: String,
+    val scamText: String,
+    val optionSafe: String,
+    val optionTrap: String,
+    val audioExplanation: String
+)
+
+@JsonClass(generateAdapter = true)
+data class AppConfigDto(
+    val factoryName: String = "Naveena Mills Ltd.",
+    val factoryUrdu: String = "نویینا ملز لمیٹڈ",
+    val welfareHelpline: String = "0800-64557",
+    val welfareHelplineLabel: String = "Naveena Welfare",
+    val rationItems: List<RationItemDto> = emptyList(),
+    val scamSimulations: List<ScamSimulationDto> = emptyList()
 )

@@ -38,6 +38,8 @@ fun RegistrationScreen(
     var factory by remember { mutableStateOf("") }
     var factoryId by remember { mutableStateOf("") }
     var jazzCash by remember { mutableStateOf("") }
+    var bankName by remember { mutableStateOf("") }
+    var bankAccountNumber by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var selectedLanguage by remember { mutableStateOf("BILINGUAL") }
@@ -216,6 +218,34 @@ fun RegistrationScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
+                    // Bank Name (optional)
+                    OutlinedTextField(
+                        value = bankName,
+                        onValueChange = { bankName = it },
+                        label = { Text("بینک کا نام / Bank Name (اختیاری)") },
+                        placeholder = { Text("HBL / Meezan / UBL") },
+                        leadingIcon = { Icon(Icons.Default.AccountBalance, contentDescription = null, tint = primaryGreen) },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // Bank Account Number (optional)
+                    OutlinedTextField(
+                        value = bankAccountNumber,
+                        onValueChange = { bankAccountNumber = it },
+                        label = { Text("بینک اکاؤنٹ / IBAN نمبر (اختیاری)") },
+                        placeholder = { Text("PK64HABB...") },
+                        leadingIcon = { Icon(Icons.Default.CreditCard, contentDescription = null, tint = primaryGreen) },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
                     // Password
                     OutlinedTextField(
                         value = password,
@@ -271,6 +301,8 @@ fun RegistrationScreen(
                                     factory = factory.trim(),
                                     factoryId = factoryId.trim().ifBlank { null },
                                     jazzCashNumber = jazzCash.trim().ifBlank { null },
+                                    bankName = bankName.trim().ifBlank { null },
+                                    bankAccountNumber = bankAccountNumber.trim().ifBlank { null },
                                     password = password.trim(),
                                     preferredLanguage = selectedLanguage
                                 )

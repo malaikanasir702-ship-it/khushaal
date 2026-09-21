@@ -19,6 +19,8 @@ const UserSchema = new mongoose.Schema({
   factory: { type: String, required: true, trim: true },
   factoryId: { type: String, trim: true },
   jazzCashNumber: { type: String, trim: true },
+  bankName: { type: String, trim: true, default: '' },
+  bankAccountNumber: { type: String, trim: true, default: '' },
   avatarUrl: { 
     type: String, 
     default: 'https://www.gstatic.com/labs-code/stitch/stitch-placeholder-300x300.svg' 
@@ -27,6 +29,11 @@ const UserSchema = new mongoose.Schema({
     type: String, 
     enum: ['BILINGUAL', 'URDU', 'ENGLISH'], 
     default: 'BILINGUAL' 
+  },
+  role: { 
+    type: String, 
+    enum: ['user', 'admin'], 
+    default: 'user' 
   },
   refreshTokenHash: { type: String },
   tokenVersion: { type: Number, default: 0 },
@@ -52,9 +59,16 @@ UserSchema.methods.toProfileDto = function() {
     factoryId: this.factoryId || '',
     phoneMasked: maskedPhone,
     cnicMasked: maskedCnic,
-    paymentAccount: this.jazzCashNumber ? `JazzCash (${this.jazzCashNumber})` : 'JazzCash',
+    rawPhone: this.phone,
+    rawCnic: this.cnic,
+    jazzCashNumber: this.jazzCashNumber || '',
+    bankName: this.bankName || '',
+    bankAccountNumber: this.bankAccountNumber || '',
+    paymentAccount: this.jazzCashNumber ? `JazzCash (${this.jazzCashNumber})` : (this.bankName ? `${this.bankName} (${this.bankAccountNumber})` : 'JazzCash / Bank'),
     avatarUrl: this.avatarUrl,
-    preferredLanguage: this.preferredLanguage
+    preferredLanguage: this.preferredLanguage,
+    role: this.role || 'user',
+    isActive: this.isActive !== undefined ? this.isActive : true
   };
 };
 

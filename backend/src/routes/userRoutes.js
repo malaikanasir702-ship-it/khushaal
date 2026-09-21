@@ -20,7 +20,7 @@ router.get('/me', authMiddleware, async (req, res) => {
 // PUT /api/users/me
 router.put('/me', authMiddleware, async (req, res) => {
   try {
-    const { name, urduName, factory, jazzCashNumber, preferredLanguage, avatarUrl } = req.body;
+    const { name, urduName, factory, jazzCashNumber, bankName, bankAccountNumber, preferredLanguage, avatarUrl } = req.body;
 
     if (preferredLanguage && !['BILINGUAL', 'URDU', 'ENGLISH'].includes(preferredLanguage)) {
       return res.status(400).json({ error: 'Invalid preferred language. Must be BILINGUAL, URDU, or ENGLISH.' });
@@ -31,6 +31,8 @@ router.put('/me', authMiddleware, async (req, res) => {
     if (urduName !== undefined) updates.urduName = urduName;
     if (factory !== undefined) updates.factory = factory;
     if (jazzCashNumber !== undefined) updates.jazzCashNumber = jazzCashNumber;
+    if (bankName !== undefined) updates.bankName = bankName;
+    if (bankAccountNumber !== undefined) updates.bankAccountNumber = bankAccountNumber;
     if (preferredLanguage !== undefined) updates.preferredLanguage = preferredLanguage;
     if (avatarUrl !== undefined) updates.avatarUrl = avatarUrl;
 

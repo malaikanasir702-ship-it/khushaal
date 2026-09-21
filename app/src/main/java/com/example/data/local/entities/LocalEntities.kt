@@ -16,7 +16,12 @@ data class UserEntity(
     val factoryId: String,
     val phoneMasked: String,
     val cnicMasked: String,
+    val rawPhone: String = "",
+    val rawCnic: String = "",
     val paymentAccount: String,
+    val jazzCashNumber: String = "",
+    val bankName: String = "",
+    val bankAccountNumber: String = "",
     val avatarUrl: String,
     val preferredLanguage: String = "BILINGUAL"
 ) {
@@ -30,7 +35,12 @@ data class UserEntity(
         factoryId = factoryId,
         phoneMasked = phoneMasked,
         cnicMasked = cnicMasked,
+        rawPhone = rawPhone,
+        rawCnic = rawCnic,
         paymentAccount = paymentAccount,
+        jazzCashNumber = jazzCashNumber,
+        bankName = bankName,
+        bankAccountNumber = bankAccountNumber,
         avatarUrl = avatarUrl
     )
 }
