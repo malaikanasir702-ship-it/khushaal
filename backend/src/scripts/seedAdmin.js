@@ -1,62 +1,69 @@
+/**
+ * Seed Script: Creates the Super Admin account in MongoDB
+ * Run: node src/scripts/seedAdmin.js
+ * 
+ * Credentials:
+ *   Phone: +923001234567
+ *   Password: Khushhaal@Admin2025!
+ */
+
+require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env') });
+
+const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-const { connectDB, disconnectDB } = require('../config/db');
 const User = require('../models/User');
+const env = require('../config/env');
 
-const seedAdmin = async () => {
-  try {
-    console.log('[Admin Seeder] Connecting to database...');
-    await connectDB();
-
-    const adminPhone = '+923000000000';
-    const adminCnic = '00000-0000000-0';
-    const adminPassword = 'AdminPassword123!';
-
-    let admin = await User.findOne({ 
-      $or: [{ phone: adminPhone }, { cnic: adminCnic }, { role: 'admin' }] 
-    });
-
-    if (!admin) {
-      console.log('[Admin Seeder] Creating default Super Admin...');
-      const passwordHash = await bcrypt.hash(adminPassword, 12);
-      admin = new User({
-        name: 'Khushhaal Super Admin',
-        urduName: 'خوشحال سپرا ایڈمن',
-        phone: adminPhone,
-        cnic: adminCnic,
-        passwordHash,
-        factory: 'Khushhaal Head Office',
-        factoryId: 'HQ-ADMIN-01',
-        jazzCashNumber: '03000000000',
-        role: 'admin',
-        preferredLanguage: 'BILINGUAL',
-        isActive: true
-      });
-      await admin.save();
-      console.log('====================================================');
-      console.log(' Super Admin successfully created!');
-      console.log(` Phone:    ${adminPhone}`);
-      console.log(` Password: ${adminPassword}`);
-      console.log(` CNIC:     ${adminCnic}`);
-      console.log('====================================================');
-    } else {
-      console.log(`[Admin Seeder] Admin account exists: ${admin.phone} (Role: ${admin.role})`);
-      if (admin.role !== 'admin') {
-        admin.role = 'admin';
-        await admin.save();
-        console.log('[Admin Seeder] Promoted existing account to admin.');
-      }
-    }
-
-    await disconnectDB();
-    console.log('[Admin Seeder] Done.');
-  } catch (error) {
-    console.error('[Admin Seeder] Error seeding admin:', error);
-    process.exit(1);
-  }
+const ADMIN_CREDENTIALS = {
+  name: 'Khushhaal Admin',
+  urduName: 'خوشحال ایڈمن',
+  phone: '+923001234567',
+  cnic: '35201-0000001-1',
+  factory: 'Khushhaal Head Office',
+  factoryId: 'KHQ-ADMIN-001',
+  password: 'Khushhaal@Admin2025!',
+  role: 'admin',
+  isActive: true
 };
 
-if (require.main === module) {
-  seedAdmin();
+async function seed() {
+  try {
+    await mongoose.connect(env.MONGODB_URI);
+    console.log('✅ Connected to MongoDB');
+
+    const existing = await User.findOne({ phone: ADMIN_CREDENTIALS.phone });
+    if (existing) {
+      console.log('⚠️  Admin already exists:', ADMIN_CREDENTIALS.phone);
+      console.log('   To reset, delete the user from MongoDB and run again.');
+      process.exit(0);
+    }
+
+    const passwordHash = await bcrypt.hash(ADMIN_CREDENTIALS.password, 12);
+    const admin = new User({
+      name: ADMIN_CREDENTIALS.name,
+      urduName: ADMIN_CREDENTIALS.urduName,
+      phone: ADMIN_CREDENTIALS.phone,
+      cnic: ADMIN_CREDENTIALS.cnic,
+      passwordHash,
+      factory: ADMIN_CREDENTIALS.factory,
+      factoryId: ADMIN_CREDENTIALS.factoryId,
+      role: 'admin',
+      isActive: true
+    });
+
+    await admin.save();
+
+    console.log('\n🎉 Super Admin created successfully!');
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log(`   Phone:    ${ADMIN_CREDENTIALS.phone}`);
+    console.log(`   Password: ${ADMIN_CREDENTIALS.password}`);
+    console.log(`   URL:      https://khushaal-production.up.railway.app/admin/`);
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+    process.exit(0);
+  } catch (error) {
+    console.error('❌ Seed error:', error.message);
+    process.exit(1);
+  }
 }
 
-module.exports = seedAdmin;
+seed();
