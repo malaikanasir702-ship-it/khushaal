@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const mongoose = require('mongoose');
+const path = require('path');
 
 // Routes
 const authRoutes = require('./routes/authRoutes');
@@ -24,9 +25,19 @@ const configRoutes = require('./routes/configRoutes');
 const app = express();
 
 // Security and middleware
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: false, // Allow admin panel assets
+}));
 app.use(cors());
 app.use(express.json());
+
+// Serve admin panel static files at /admin
+const adminDistPath = path.join(__dirname, '../public/admin');
+app.use('/admin', express.static(adminDistPath));
+// SPA fallback — any /admin/* route serves index.html
+app.get('/admin/*', (req, res) => {
+  res.sendFile(path.join(adminDistPath, 'index.html'));
+});
 
 // Health check endpoint (Task 1.2)
 app.get('/api/health', (req, res) => {
