@@ -16,3 +16,10 @@
 local.properties
 .env
 debug.keystore
+*.jks
+build_app.bat
+install_apk.bat
+gradlew.bat
+node_modules/
+admin/node_modules/
+*/node_modules/
