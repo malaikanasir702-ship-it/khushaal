@@ -72,6 +72,7 @@ fun EarnMoreScreen(
   onPlayVoice: (String, String) -> Unit,
   modifier: Modifier = Modifier,
   onNavigateToDestination: (AppDestination) -> Unit = {},
+  factoryName: String = "Factory",
 ) {
   LazyColumn(
     modifier = modifier
@@ -372,7 +373,7 @@ fun EarnMoreScreen(
                 color = SlateTextPrimary
               )
               Text(
-                text = "Naveena Mills worker wife who made Rs. 16,500 in 2nd month",
+                text = "$factoryName worker wife who made Rs. 16,500 in 2nd month",
                 fontSize = 10.sp,
                 color = SlateTextSecondary,
                 lineHeight = 13.sp
@@ -387,8 +388,8 @@ fun EarnMoreScreen(
               .border(1.dp, AmberBrand.copy(alpha = 0.4f), RoundedCornerShape(10.dp))
               .clickable {
                 onPlayVoice(
-                  "Razia Aapa ne Naveena Mills colony mein silai ka kaam shuru kiya aur doosray maheenay 16,500 rupay kamaye. Aap bhi yeh kar saktay hain.",
-                  "Razia Aapa ne Naveena Mills colony mein silai ka kaam shuru kiya."
+                  "Razia Aapa ne $factoryName colony mein silai ka kaam shuru kiya aur doosray maheenay 16,500 rupay kamaye. Aap bhi yeh kar saktay hain.",
+                  "Razia Aapa ne $factoryName colony mein silai ka kaam shuru kiya."
                 )
               }
               .padding(horizontal = 8.dp, vertical = 5.dp)

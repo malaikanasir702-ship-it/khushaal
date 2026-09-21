@@ -55,8 +55,14 @@ class RetrofitClient private constructor(private val appContext: Context) {
     }
 
     companion object {
-        // Standard Android emulator loopback to host PC on port 5000
-        const val DEFAULT_BASE_URL = "http://10.0.2.2:5000/"
+        // In release builds, use the production URL from BuildConfig.
+        // In debug builds, fall back to the emulator loopback.
+        val DEFAULT_BASE_URL: String
+            get() = if (com.example.BuildConfig.BUILD_TYPE == "release") {
+                com.example.BuildConfig.PRODUCTION_API_URL
+            } else {
+                "http://10.0.2.2:5000/"
+            }
 
         @Volatile
         private var INSTANCE: RetrofitClient? = null

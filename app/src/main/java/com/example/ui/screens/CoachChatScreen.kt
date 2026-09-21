@@ -73,6 +73,7 @@ fun CoachChatScreen(
   onSendMessage: (String) -> Unit,
   onPlayVoice: (String, String) -> Unit,
   modifier: Modifier = Modifier,
+  factoryName: String = "Factory",
 ) {
   var inputText by remember { mutableStateOf("") }
   val listState = rememberLazyListState()
@@ -136,7 +137,7 @@ fun CoachChatScreen(
             color = SlateTextPrimary
           )
           Text(
-            text = "Naveena Mills Certified • آن لائن",
+            text = "$factoryName Certified • آن لائن",
             fontSize = 10.sp,
             color = EmeraldDark,
             fontWeight = FontWeight.Medium

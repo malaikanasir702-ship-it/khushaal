@@ -22,6 +22,19 @@ const Prosperity = require('../models/Prosperity');
 const Notification = require('../models/Notification');
 const CoachMessage = require('../models/CoachMessage');
 const CashFlow = require('../models/CashFlow');
+const Payslip = require('../models/Payslip');
+
+const rateLimit = require('express-rate-limit');
+
+// Rate limit for admin login: 5 attempts per 15 min per IP
+const adminLoginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: { error: 'Too many login attempts. Please try again after 15 minutes.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: () => process.env.NODE_ENV === 'test'
+});
 
 const router = express.Router();
 
@@ -30,7 +43,7 @@ const router = express.Router();
 // ==========================================
 
 // POST /api/admin/auth/login
-router.post('/auth/login', async (req, res) => {
+router.post('/auth/login', adminLoginLimiter, async (req, res) => {
   try {
     const { identifier, password } = req.body;
     if (!identifier || !password) {
@@ -588,8 +601,8 @@ router.put('/users/:id/status', async (req, res) => {
 router.put('/users/:id/reset-password', async (req, res) => {
   try {
     const { newPassword } = req.body;
-    if (!newPassword || newPassword.length < 6) {
-      return res.status(400).json({ error: 'Password must be at least 6 characters long' });
+    if (!newPassword || newPassword.length < 8) {
+      return res.status(400).json({ error: 'Password must be at least 8 characters long' });
     }
     const passwordHash = await bcrypt.hash(newPassword, 12);
     const user = await User.findByIdAndUpdate(
@@ -1513,6 +1526,167 @@ router.get('/system/health', async (req, res) => {
     });
   } catch (error) {
     return res.status(500).json({ error: 'Error getting system health metrics' });
+  }
+});
+
+// ==========================================
+// 15. PAYSLIPS (FACTORY SALARY SLIPS)
+// ==========================================
+
+// GET /api/admin/payslips — List all payslips with optional filters
+router.get('/payslips', async (req, res) => {
+  try {
+    const { userId, month, page = 1, limit = 25 } = req.query;
+    const pageNum = Math.max(1, parseInt(page, 10) || 1);
+    const limitNum = Math.max(1, Math.min(100, parseInt(limit, 10) || 25));
+
+    const query = {};
+    if (userId) query.userId = userId;
+    if (month) query.month = { $regex: month, $options: 'i' };
+
+    const total = await Payslip.countDocuments(query);
+    const payslips = await Payslip.find(query)
+      .sort({ createdAt: -1 })
+      .skip((pageNum - 1) * limitNum)
+      .limit(limitNum)
+      .populate('userId', 'name phone factory factoryId');
+
+    return res.json({
+      items: payslips.map(p => ({
+        id: p._id.toString(),
+        userId: p.userId ? p.userId._id.toString() : null,
+        workerName: p.userId ? p.userId.name : 'Unknown',
+        workerPhone: p.userId ? p.userId.phone : '',
+        factory: p.userId ? p.userId.factory : '',
+        month: p.month,
+        employeeName: p.employeeName,
+        employeeId: p.employeeId,
+        department: p.department,
+        daysPresent: p.daysPresent,
+        daysAbsent: p.daysAbsent,
+        overtimeHours: p.overtimeHours,
+        baseWage: p.baseWage,
+        overtimePay: p.overtimePay,
+        attendanceBonus: p.attendanceBonus,
+        productionBonus: p.productionBonus,
+        totalGrossWage: p.totalGrossWage,
+        eobiDeduction: p.eobiDeduction,
+        messAdvanceDeduction: p.messAdvanceDeduction,
+        unionFundDeduction: p.unionFundDeduction,
+        totalDeductions: p.totalDeductions,
+        netTakeHome: p.netTakeHome,
+        paymentStatus: p.paymentStatus,
+        creditedDate: p.creditedDate,
+        disbursementAccount: p.disbursementAccount,
+        createdAt: p.createdAt
+      })),
+      total,
+      page: pageNum,
+      pages: Math.ceil(total / limitNum) || 1
+    });
+  } catch (error) {
+    return res.status(500).json({ error: 'Error fetching payslips' });
+  }
+});
+
+// POST /api/admin/payslips — Create payslip for a worker
+router.post('/payslips', async (req, res) => {
+  try {
+    const {
+      userId, month, employeeName, employeeId, department,
+      daysPresent, daysAbsent, overtimeHours,
+      baseWage, overtimePay, attendanceBonus, productionBonus,
+      eobiDeduction, messAdvanceDeduction, unionFundDeduction,
+      paymentStatus, creditedDate, disbursementAccount
+    } = req.body;
+
+    if (!userId || !month) {
+      return res.status(400).json({ error: 'userId and month are required' });
+    }
+
+    const gross = (Number(baseWage) || 0) + (Number(overtimePay) || 0) +
+      (Number(attendanceBonus) || 0) + (Number(productionBonus) || 0);
+    const deductions = (Number(eobiDeduction) || 0) + (Number(messAdvanceDeduction) || 0) +
+      (Number(unionFundDeduction) || 0);
+
+    const payslip = new Payslip({
+      userId,
+      month: month.trim(),
+      employeeName: employeeName || '',
+      employeeId: employeeId || '',
+      department: department || '',
+      daysPresent: Number(daysPresent) || 0,
+      daysAbsent: Number(daysAbsent) || 0,
+      overtimeHours: Number(overtimeHours) || 0,
+      baseWage: Number(baseWage) || 0,
+      overtimePay: Number(overtimePay) || 0,
+      attendanceBonus: Number(attendanceBonus) || 0,
+      productionBonus: Number(productionBonus) || 0,
+      totalGrossWage: gross,
+      eobiDeduction: Number(eobiDeduction) || 0,
+      messAdvanceDeduction: Number(messAdvanceDeduction) || 0,
+      unionFundDeduction: Number(unionFundDeduction) || 0,
+      totalDeductions: deductions,
+      netTakeHome: Math.max(0, gross - deductions),
+      paymentStatus: paymentStatus || 'زیر عمل (Pending)',
+      creditedDate: creditedDate || '',
+      disbursementAccount: disbursementAccount || ''
+    });
+
+    await payslip.save();
+    return res.status(201).json(payslip);
+  } catch (error) {
+    if (error.code === 11000) {
+      return res.status(409).json({ error: 'Payslip for this worker and month already exists' });
+    }
+    return res.status(500).json({ error: 'Error creating payslip', message: error.message });
+  }
+});
+
+// PUT /api/admin/payslips/:id — Update a payslip
+router.put('/payslips/:id', async (req, res) => {
+  try {
+    const payslip = await Payslip.findById(req.params.id);
+    if (!payslip) return res.status(404).json({ error: 'Payslip not found' });
+
+    const fields = [
+      'month', 'employeeName', 'employeeId', 'department',
+      'daysPresent', 'daysAbsent', 'overtimeHours',
+      'baseWage', 'overtimePay', 'attendanceBonus', 'productionBonus',
+      'eobiDeduction', 'messAdvanceDeduction', 'unionFundDeduction',
+      'paymentStatus', 'creditedDate', 'disbursementAccount'
+    ];
+
+    fields.forEach(field => {
+      if (req.body[field] !== undefined) {
+        payslip[field] = ['daysPresent','daysAbsent','overtimeHours','baseWage','overtimePay',
+          'attendanceBonus','productionBonus','eobiDeduction','messAdvanceDeduction','unionFundDeduction']
+          .includes(field) ? Number(req.body[field]) : req.body[field];
+      }
+    });
+
+    // Recalculate derived fields
+    payslip.totalGrossWage = payslip.baseWage + payslip.overtimePay +
+      payslip.attendanceBonus + payslip.productionBonus;
+    payslip.totalDeductions = payslip.eobiDeduction + payslip.messAdvanceDeduction +
+      payslip.unionFundDeduction;
+    payslip.netTakeHome = Math.max(0, payslip.totalGrossWage - payslip.totalDeductions);
+    payslip.updatedAt = new Date();
+
+    await payslip.save();
+    return res.json(payslip);
+  } catch (error) {
+    return res.status(500).json({ error: 'Error updating payslip' });
+  }
+});
+
+// DELETE /api/admin/payslips/:id
+router.delete('/payslips/:id', async (req, res) => {
+  try {
+    await Payslip.findByIdAndDelete(req.params.id);
+    return res.json({ message: 'Payslip deleted' });
+  } catch (error) {
+    return res.status(500).json({ error: 'Error deleting payslip' });
   }
 });
 

@@ -21,14 +21,36 @@ const notificationRoutes = require('./routes/notificationRoutes');
 const coachRoutes = require('./routes/coachRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const configRoutes = require('./routes/configRoutes');
+const payslipRoutes = require('./routes/payslipRoutes');
 
 const app = express();
 
 // Security and middleware
 app.use(helmet({
-  contentSecurityPolicy: false, // Allow admin panel assets
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"], // needed for React SPA
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'"],
+      fontSrc: ["'self'", "https:", "data:"],
+      objectSrc: ["'none'"],
+      mediaSrc: ["'self'"],
+      frameSrc: ["'none'"],
+    },
+  },
+  crossOriginEmbedderPolicy: false,
 }));
-app.use(cors());
+
+// CORS — restrict to admin panel domain in production
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production'
+    ? (process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim()) : [])
+    : true, // allow all in dev
+  credentials: true,
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Serve admin panel static files at /admin
@@ -49,41 +71,47 @@ app.get('/api/health', (req, res) => {
   }
 });
 
-// One-time admin seed endpoint — protected by secret token
-app.post('/api/internal/seed-admin', async (req, res) => {
-  const { secret } = req.body;
-  if (secret !== 'khushhaal_seed_2025_secret') {
-    return res.status(403).json({ error: 'Forbidden' });
-  }
-  try {
-    const bcrypt = require('bcryptjs');
-    const User = require('./models/User');
-    const existing = await User.findOne({ phone: '+923001234567' });
-    if (existing) {
-      return res.json({ message: 'Admin already exists', phone: '+923001234567' });
+// One-time admin seed endpoint — env-gated, never runs in production by default
+// Set ENABLE_SEED_ENDPOINT=true in .env to enable (development/staging only)
+if (process.env.ENABLE_SEED_ENDPOINT === 'true' && process.env.NODE_ENV !== 'production') {
+  app.post('/api/internal/seed-admin', async (req, res) => {
+    const { secret } = req.body;
+    const expectedSecret = process.env.SEED_SECRET;
+    if (!expectedSecret || secret !== expectedSecret) {
+      return res.status(403).json({ error: 'Forbidden' });
     }
-    const passwordHash = await bcrypt.hash('Khushhaal@Admin2025!', 12);
-    const admin = new User({
-      name: 'Khushhaal Admin',
-      urduName: 'خوشحال ایڈمن',
-      phone: '+923001234567',
-      cnic: '35201-0000001-1',
-      passwordHash,
-      factory: 'Khushhaal Head Office',
-      factoryId: 'KHQ-ADMIN-001',
-      role: 'admin',
-      isActive: true
-    });
-    await admin.save();
-    return res.status(201).json({
-      message: 'Admin created successfully!',
-      phone: '+923001234567',
-      password: 'Khushhaal@Admin2025!'
-    });
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
-  }
-});
+    try {
+      const bcrypt = require('bcryptjs');
+      const User = require('./models/User');
+      const adminPhone = process.env.SEED_ADMIN_PHONE;
+      const adminPassword = process.env.SEED_ADMIN_PASSWORD;
+      if (!adminPhone || !adminPassword) {
+        return res.status(500).json({ error: 'SEED_ADMIN_PHONE and SEED_ADMIN_PASSWORD must be set in .env' });
+      }
+      const existing = await User.findOne({ phone: adminPhone });
+      if (existing) {
+        return res.json({ message: 'Admin already exists', phone: adminPhone });
+      }
+      const passwordHash = await bcrypt.hash(adminPassword, 12);
+      const admin = new User({
+        name: process.env.SEED_ADMIN_NAME || 'Khushhaal Admin',
+        urduName: 'خوشحال ایڈمن',
+        phone: adminPhone,
+        cnic: process.env.SEED_ADMIN_CNIC || '35201-0000001-1',
+        passwordHash,
+        factory: 'Khushhaal Head Office',
+        factoryId: 'KHQ-ADMIN-001',
+        role: 'admin',
+        isActive: true
+      });
+      await admin.save();
+      // NEVER return password in response
+      return res.status(201).json({ message: 'Admin created successfully', phone: adminPhone });
+    } catch (error) {
+      return res.status(500).json({ error: error.message });
+    }
+  });
+}
 
 // Mount routes
 app.use('/api/auth', authRoutes);
@@ -102,6 +130,7 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/coach', coachRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/config', configRoutes);
+app.use('/api/payslip', payslipRoutes);
 
 // 404 handler
 app.use((req, res) => {

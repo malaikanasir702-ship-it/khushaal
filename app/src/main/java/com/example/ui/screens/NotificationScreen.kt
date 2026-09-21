@@ -92,6 +92,7 @@ fun NotificationScreen(
   onClearAll: () -> Unit,
   onPlayVoice: (String, String) -> Unit,
   modifier: Modifier = Modifier,
+  factoryName: String = "Factory",
 ) {
   var selectedCategory by remember { mutableStateOf<NotificationCategory?>(null) }
 
@@ -173,7 +174,7 @@ fun NotificationScreen(
               }
 
               Text(
-                text = "Naveena Mills, JazzCash & SBP Updates",
+                text = "$factoryName, JazzCash & SBP Updates",
                 fontSize = 11.sp,
                 color = SlateTextSecondary,
                 maxLines = 1,
@@ -333,7 +334,8 @@ fun NotificationScreen(
             notification = notif,
             currentLanguage = currentLanguage,
             onClick = { onNotificationClick(notif) },
-            onPlayVoice = onPlayVoice
+            onPlayVoice = onPlayVoice,
+            factoryName = factoryName
           )
         }
       }
@@ -370,9 +372,10 @@ private fun NotificationCard(
   currentLanguage: AppLanguage,
   onClick: () -> Unit,
   onPlayVoice: (String, String) -> Unit,
+  factoryName: String = "Factory",
 ) {
   val (categoryColor, categorySurface, categoryIcon, categoryLabel) = when (notification.category) {
-    NotificationCategory.FACTORY -> Quadruple(TealPrimary, TealSurface, Icons.Default.Business, "فیکٹری الرٹ • Naveena Mills")
+    NotificationCategory.FACTORY -> Quadruple(TealPrimary, TealSurface, Icons.Default.Business, "فیکٹری الرٹ • $factoryName")
     NotificationCategory.FINANCE -> Quadruple(EmeraldDark, EmeraldSurface, Icons.Default.AccountBalanceWallet, "کھاتہ و کمیٹی • Finance")
     NotificationCategory.SECURITY -> Quadruple(RoseAlert, RoseSurface, Icons.Default.Security, "تحفظ الرٹ • State Bank")
     NotificationCategory.COACH -> Quadruple(AmberDark, AmberSurface, Icons.Default.SupportAgent, "کوچ فاطمہ • Guidance")

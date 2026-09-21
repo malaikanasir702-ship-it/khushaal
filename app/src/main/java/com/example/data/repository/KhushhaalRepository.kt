@@ -894,6 +894,49 @@ class KhushhaalRepository(
         }
     }
 
+    // --- Factory Payslip ---
+    suspend fun getPayslip(): Result<FactoryPayslip> {
+        return try {
+            val response = apiService.getPayslip()
+            if (response.isSuccessful) {
+                val dto = response.body()
+                if (dto != null) {
+                    Result.Success(FactoryPayslip(
+                        month = dto.month,
+                        employeeName = dto.employeeName,
+                        employeeId = dto.employeeId,
+                        department = dto.department,
+                        daysPresent = dto.daysPresent,
+                        daysAbsent = dto.daysAbsent,
+                        overtimeHours = dto.overtimeHours,
+                        baseWage = dto.baseWage,
+                        overtimePay = dto.overtimePay,
+                        attendanceBonus = dto.attendanceBonus,
+                        productionBonus = dto.productionBonus,
+                        totalGrossWage = dto.totalGrossWage,
+                        eobiDeduction = dto.eobiDeduction,
+                        messAdvanceDeduction = dto.messAdvanceDeduction,
+                        unionFundDeduction = dto.unionFundDeduction,
+                        totalDeductions = dto.totalDeductions,
+                        netTakeHome = dto.netTakeHome,
+                        paymentStatus = dto.paymentStatus,
+                        creditedDate = dto.creditedDate,
+                        disbursementAccount = dto.disbursementAccount
+                    ))
+                } else {
+                    // No payslip uploaded yet — return empty
+                    Result.Success(FactoryPayslip())
+                }
+            } else {
+                Result.Error(response.code(), response.message() ?: "Error fetching payslip")
+            }
+        } catch (e: IOException) {
+            Result.Error(0, "انٹرنیٹ کنیکشن نہیں / No internet connection")
+        } catch (e: Exception) {
+            Result.Error(-1, e.localizedMessage ?: "Error fetching payslip")
+        }
+    }
+
     // --- Coach Messages ---
     fun getCoachMessages(): Flow<Result<List<CoachMessage>>> = flow {
         emit(Result.Loading)

@@ -387,11 +387,56 @@ data class ScamSimulationDto(
 )
 
 @JsonClass(generateAdapter = true)
+data class SkillOpportunityDto(
+    val id: String = "",
+    val nameUrdu: String = "",
+    val nameEnglish: String = "",
+    val iconEmoji: String = "💼",
+    val roleTitle: String = "",
+    val roleUrdu: String = "",
+    val idealFor: String = "",
+    val startingInvestment: String = "",
+    val investmentNote: String = "",
+    val monthlyProfit: String = "",
+    val profitNote: String = "",
+    val requirements: String = "",
+    val matchPercentage: Int = 70
+)
+
+@JsonClass(generateAdapter = true)
 data class AppConfigDto(
     val factoryName: String = "Naveena Mills Ltd.",
     val factoryUrdu: String = "نویینا ملز لمیٹڈ",
     val welfareHelpline: String = "0800-64557",
     val welfareHelplineLabel: String = "Naveena Welfare",
     val rationItems: List<RationItemDto> = emptyList(),
-    val scamSimulations: List<ScamSimulationDto> = emptyList()
+    val scamSimulations: List<ScamSimulationDto> = emptyList(),
+    val skillOpportunities: List<SkillOpportunityDto>? = null
+)
+
+// ─── Payslip (Factory Salary Slip) ───────────────────────────────────────────
+
+@JsonClass(generateAdapter = true)
+data class PayslipDto(
+    val id: String? = null,
+    val month: String = "",
+    val employeeName: String = "",
+    val employeeId: String = "",
+    val department: String = "",
+    val daysPresent: Int = 0,
+    val daysAbsent: Int = 0,
+    val overtimeHours: Double = 0.0,
+    val baseWage: Long = 0,
+    val overtimePay: Long = 0,
+    val attendanceBonus: Long = 0,
+    val productionBonus: Long = 0,
+    val totalGrossWage: Long = 0,
+    val eobiDeduction: Long = 0,
+    val messAdvanceDeduction: Long = 0,
+    val unionFundDeduction: Long = 0,
+    val totalDeductions: Long = 0,
+    val netTakeHome: Long = 0,
+    val paymentStatus: String = "زیر عمل (Pending)",
+    val creditedDate: String = "",
+    val disbursementAccount: String = ""
 )

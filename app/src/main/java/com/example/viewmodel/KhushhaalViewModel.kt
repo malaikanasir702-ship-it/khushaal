@@ -140,130 +140,133 @@ class KhushhaalViewModel(application: Application) : AndroidViewModel(applicatio
   private val _customerOrders = MutableStateFlow<List<CustomerOrder>>(emptyList())
   val customerOrders: StateFlow<List<CustomerOrder>> = _customerOrders.asStateFlow()
 
-  val availableSkills = listOf(
-    SkillOpportunity(
-      id = "tailoring",
-      nameEnglish = "Silai Karhai",
-      nameUrdu = "سلائی کڑھائی",
-      iconEmoji = "✂️",
-      roleTitle = "Home Tailoring & Alteration",
-      roleUrdu = "گھریلو سلائی اور الٹریشن سروس",
-      idealFor = "Ideal for: Spouse (بیگم) • 2–3 hrs/day",
-      startingInvestment = "Rs. 4,500",
-      investmentNote = "Machine tune-up + threads",
-      monthlyProfit = "Rs. 12k – 18k",
-      profitNote = "15–20 suits / month",
-      requirements = "ضروری سامان: گھر پر سلائی مشین اور محلے کے 10 جاننے والے افراد",
-      matchPercentage = 94
-    ),
-    SkillOpportunity(
-      id = "food",
-      nameEnglish = "Khana & Baking",
-      nameUrdu = "کھانا پکانا و نان بائی",
-      iconEmoji = "🍲",
-      roleTitle = "Home Catering & Dabba Service",
-      roleUrdu = "گھریلو کھانا و لنچ ڈبہ سروس",
-      idealFor = "Ideal for: Household • Morning Prep",
-      startingInvestment = "Rs. 3,000",
-      investmentNote = "Utensils & first batch ration",
-      monthlyProfit = "Rs. 10k – 15k",
-      profitNote = "10–12 regular mill lunch boxes",
-      requirements = "ضروری سامان: صاف کچن، ڈبے اور فیکٹری ورکرز نیٹ ورک",
-      matchPercentage = 88
-    ),
-    SkillOpportunity(
-      id = "tuition",
-      nameEnglish = "Tuition / Teaching",
-      nameUrdu = "ٹیوشن پڑھانا",
-      iconEmoji = "🎓",
-      roleTitle = "Neighborhood Primary Tuition Center",
-      roleUrdu = "محلہ پرائمری ٹیوشن سینٹر",
-      idealFor = "Ideal for: Educated Child / Sister",
-      startingInvestment = "Rs. 1,000",
-      investmentNote = "Whiteboard & markers",
-      monthlyProfit = "Rs. 8k – 14k",
-      profitNote = "6–10 neighborhood students",
-      requirements = "ضروری سامان: بیٹھنے کی چٹائی، وائٹ بورڈ اور پرائمری نصاب",
-      matchPercentage = 85
-    ),
-    SkillOpportunity(
-      id = "driving",
-      nameEnglish = "Driving / Delivery",
-      nameUrdu = "ڈرائیونگ و سواری",
-      iconEmoji = "🛵",
-      roleTitle = "Part-time Ride & Delivery Route",
-      roleUrdu = "پارٹ ٹائم سواری و ڈلیوری سروس",
-      idealFor = "Ideal for: Worker evening shifts",
-      startingInvestment = "Rs. 2,500",
-      investmentNote = "Helmet + mobile mount + fuel",
-      monthlyProfit = "Rs. 15k – 22k",
-      profitNote = "2–3 hrs daily after factory shift",
-      requirements = "ضروری سامان: موٹر سائیکل، ڈرائیونگ لائسنس اور اسمارٹ فون",
-      matchPercentage = 82
-    ),
-    SkillOpportunity(
-      id = "beauty",
-      nameEnglish = "Beauty Parlor",
-      nameUrdu = "بیوٹی پارلر سروسز",
-      iconEmoji = "✨",
-      roleTitle = "Home Beauty & Mehendi Service",
-      roleUrdu = "گھر پر بیوٹی و مہندی سروس",
-      idealFor = "Ideal for: Female household members",
-      startingInvestment = "Rs. 5,000",
-      investmentNote = "Basic parlor kit & mehendi cones",
-      monthlyProfit = "Rs. 12k – 20k",
-      profitNote = "Weddings, Eid and daily styling",
-      requirements = "ضروری سامان: مہندی، فیشل کٹ اور خواتین گاہکوں کا اعتماد",
-      matchPercentage = 80
-    ),
-    SkillOpportunity(
-      id = "mobile",
-      nameEnglish = "Mobile Repair",
-      nameUrdu = "موبائل ریپئرنگ",
-      iconEmoji = "📱",
-      roleTitle = "Screen & Accessory Replacement",
-      roleUrdu = "موبائل اسکرین و پارٹس مرمت",
-      idealFor = "Ideal for: Tech-inclined worker/youth",
-      startingInvestment = "Rs. 6,000",
-      investmentNote = "Precision toolkit & glue",
-      monthlyProfit = "Rs. 14k – 25k",
-      profitNote = "Factory coworker quick fixes",
-      requirements = "ضروری سامان: اسکرو ڈرائیور کٹ اور بنیادی پارٹس سپلائر",
-      matchPercentage = 78
-    ),
-    SkillOpportunity(
-      id = "crafts",
-      nameEnglish = "Handicrafts",
-      nameUrdu = "دستکاری و سجاوٹ",
-      iconEmoji = "🎨",
-      roleTitle = "Embroidery & Crochet Boutique",
-      roleUrdu = "ہاتھ کی کڑھائی و کروشیا اشیاء",
-      idealFor = "Ideal for: Home craft artisans",
-      startingInvestment = "Rs. 3,500",
-      investmentNote = "Wool, threads and frames",
-      monthlyProfit = "Rs. 9k – 16k",
-      profitNote = "Boutique orders and local bazar",
-      requirements = "ضروری سامان: دھاگے، کڑھائی فریم اور ڈیزائن کیٹلاگ",
-      matchPercentage = 75
-    ),
-    SkillOpportunity(
-      id = "trading",
-      nameEnglish = "Small Trading",
-      nameUrdu = "چھوٹا کیبن / کریانہ",
-      iconEmoji = "🏪",
-      roleTitle = "Neighborhood Mini Kiryana Box",
-      roleUrdu = "گھر کی کھڑکی سے بنیادی کریانہ",
-      idealFor = "Ideal for: Elders / Family at home",
-      startingInvestment = "Rs. 8,000",
-      investmentNote = "Dry candies, spices, pulses",
-      monthlyProfit = "Rs. 15k – 25k",
-      profitNote = "Quick neighborhood daily needs",
-      requirements = "ضروری سامان: الماری، ترازو اور تھوک مارکیٹ خریداری",
-      matchPercentage = 70
+  private val _availableSkills = MutableStateFlow<List<SkillOpportunity>>(
+    listOf(
+      SkillOpportunity(
+        id = "tailoring",
+        nameEnglish = "Silai Karhai",
+        nameUrdu = "سلائی کڑھائی",
+        iconEmoji = "✂️",
+        roleTitle = "Home Tailoring & Alteration",
+        roleUrdu = "گھریلو سلائی اور الٹریشن سروس",
+        idealFor = "Ideal for: Spouse (بیگم) • 2–3 hrs/day",
+        startingInvestment = "Rs. 4,500",
+        investmentNote = "Machine tune-up + threads",
+        monthlyProfit = "Rs. 12k – 18k",
+        profitNote = "15–20 suits / month",
+        requirements = "ضروری سامان: گھر پر سلائی مشین اور محلے کے 10 جاننے والے افراد",
+        matchPercentage = 94
+      ),
+      SkillOpportunity(
+        id = "food",
+        nameEnglish = "Khana & Baking",
+        nameUrdu = "کھانا پکانا و نان بائی",
+        iconEmoji = "🍲",
+        roleTitle = "Home Catering & Dabba Service",
+        roleUrdu = "گھریلو کھانا و لنچ ڈبہ سروس",
+        idealFor = "Ideal for: Household • Morning Prep",
+        startingInvestment = "Rs. 3,000",
+        investmentNote = "Utensils & first batch ration",
+        monthlyProfit = "Rs. 10k – 15k",
+        profitNote = "10–12 regular mill lunch boxes",
+        requirements = "ضروری سامان: صاف کچن، ڈبے اور فیکٹری ورکرز نیٹ ورک",
+        matchPercentage = 88
+      ),
+      SkillOpportunity(
+        id = "tuition",
+        nameEnglish = "Tuition / Teaching",
+        nameUrdu = "ٹیوشن پڑھانا",
+        iconEmoji = "🎓",
+        roleTitle = "Neighborhood Primary Tuition Center",
+        roleUrdu = "محلہ پرائمری ٹیوشن سینٹر",
+        idealFor = "Ideal for: Educated Child / Sister",
+        startingInvestment = "Rs. 1,000",
+        investmentNote = "Whiteboard & markers",
+        monthlyProfit = "Rs. 8k – 14k",
+        profitNote = "6–10 neighborhood students",
+        requirements = "ضروری سامان: بیٹھنے کی چٹائی، وائٹ بورڈ اور پرائمری نصاب",
+        matchPercentage = 85
+      ),
+      SkillOpportunity(
+        id = "driving",
+        nameEnglish = "Driving / Delivery",
+        nameUrdu = "ڈرائیونگ و سواری",
+        iconEmoji = "🛵",
+        roleTitle = "Part-time Ride & Delivery Route",
+        roleUrdu = "پارٹ ٹائم سواری و ڈلیوری سروس",
+        idealFor = "Ideal for: Worker evening shifts",
+        startingInvestment = "Rs. 2,500",
+        investmentNote = "Helmet + mobile mount + fuel",
+        monthlyProfit = "Rs. 15k – 22k",
+        profitNote = "2–3 hrs daily after factory shift",
+        requirements = "ضروری سامان: موٹر سائیکل، ڈرائیونگ لائسنس اور اسمارٹ فون",
+        matchPercentage = 82
+      ),
+      SkillOpportunity(
+        id = "beauty",
+        nameEnglish = "Beauty Parlor",
+        nameUrdu = "بیوٹی پارلر سروسز",
+        iconEmoji = "✨",
+        roleTitle = "Home Beauty & Mehendi Service",
+        roleUrdu = "گھر پر بیوٹی و مہندی سروس",
+        idealFor = "Ideal for: Female household members",
+        startingInvestment = "Rs. 5,000",
+        investmentNote = "Basic parlor kit & mehendi cones",
+        monthlyProfit = "Rs. 12k – 20k",
+        profitNote = "Weddings, Eid and daily styling",
+        requirements = "ضروری سامان: مہندی، فیشل کٹ اور خواتین گاہکوں کا اعتماد",
+        matchPercentage = 80
+      ),
+      SkillOpportunity(
+        id = "mobile",
+        nameEnglish = "Mobile Repair",
+        nameUrdu = "موبائل ریپئرنگ",
+        iconEmoji = "📱",
+        roleTitle = "Screen & Accessory Replacement",
+        roleUrdu = "موبائل اسکرین و پارٹس مرمت",
+        idealFor = "Ideal for: Tech-inclined worker/youth",
+        startingInvestment = "Rs. 6,000",
+        investmentNote = "Precision toolkit & glue",
+        monthlyProfit = "Rs. 14k – 25k",
+        profitNote = "Factory coworker quick fixes",
+        requirements = "ضروری سامان: اسکرو ڈرائیور کٹ اور بنیادی پارٹس سپلائر",
+        matchPercentage = 78
+      ),
+      SkillOpportunity(
+        id = "crafts",
+        nameEnglish = "Handicrafts",
+        nameUrdu = "دستکاری و سجاوٹ",
+        iconEmoji = "🎨",
+        roleTitle = "Embroidery & Crochet Boutique",
+        roleUrdu = "ہاتھ کی کڑھائی و کروشیا اشیاء",
+        idealFor = "Ideal for: Home craft artisans",
+        startingInvestment = "Rs. 3,500",
+        investmentNote = "Wool, threads and frames",
+        monthlyProfit = "Rs. 9k – 16k",
+        profitNote = "Boutique orders and local bazar",
+        requirements = "ضروری سامان: دھاگے، کڑھائی فریم اور ڈیزائن کیٹلاگ",
+        matchPercentage = 75
+      ),
+      SkillOpportunity(
+        id = "trading",
+        nameEnglish = "Small Trading",
+        nameUrdu = "چھوٹا کیبن / کریانہ",
+        iconEmoji = "🏪",
+        roleTitle = "Neighborhood Mini Kiryana Box",
+        roleUrdu = "گھر کی کھڑکی سے بنیادی کریانہ",
+        idealFor = "Ideal for: Elders / Family at home",
+        startingInvestment = "Rs. 8,000",
+        investmentNote = "Dry candies, spices, pulses",
+        monthlyProfit = "Rs. 15k – 25k",
+        profitNote = "Quick neighborhood daily needs",
+        requirements = "ضروری سامان: الماری، ترازو اور تھوک مارکیٹ خریداری",
+        matchPercentage = 70
+      )
     )
   )
+  val availableSkills: StateFlow<List<SkillOpportunity>> = _availableSkills.asStateFlow()
 
-  private val _selectedSkill = MutableStateFlow(availableSkills.first())
+  private val _selectedSkill = MutableStateFlow(_availableSkills.value.first())
   val selectedSkill: StateFlow<SkillOpportunity> = _selectedSkill.asStateFlow()
 
   private val _roadmapSteps = MutableStateFlow(
@@ -378,6 +381,28 @@ class KhushhaalViewModel(application: Application) : AndroidViewModel(applicatio
               )
             }
           }
+          if (!cfg.skillOpportunities.isNullOrEmpty()) {
+            _availableSkills.value = cfg.skillOpportunities.map {
+              SkillOpportunity(
+                id = it.id,
+                nameEnglish = it.nameEnglish,
+                nameUrdu = it.nameUrdu,
+                iconEmoji = it.iconEmoji.ifBlank { "💼" },
+                roleTitle = it.roleTitle,
+                roleUrdu = it.roleUrdu,
+                idealFor = it.idealFor,
+                startingInvestment = it.startingInvestment,
+                investmentNote = it.investmentNote,
+                monthlyProfit = it.monthlyProfit,
+                profitNote = it.profitNote,
+                requirements = it.requirements,
+                matchPercentage = it.matchPercentage
+              )
+            }
+            if (_availableSkills.value.isNotEmpty()) {
+              _selectedSkill.value = _availableSkills.value.first()
+            }
+          }
         }
       } catch (e: Exception) {
         // Config load failure is non-critical — app works with empty lists
@@ -412,6 +437,7 @@ class KhushhaalViewModel(application: Application) : AndroidViewModel(applicatio
     loadNotifications()
     loadCustomerOrders()
     loadCoachMessages()
+    loadPayslip()
   }
 
   private fun loadUserProfile() {
@@ -548,6 +574,15 @@ class KhushhaalViewModel(application: Application) : AndroidViewModel(applicatio
   fun setOnboardingIncome(amount: Long) {
     if (amount > 0L) {
       _cashFlow.update { it.copy(income = amount) }
+    }
+  }
+
+  fun loadPayslip() {
+    viewModelScope.launch {
+      when (val result = repository.getPayslip()) {
+        is Result.Success -> _payslip.value = result.data
+        else -> { /* keep existing value */ }
+      }
     }
   }
 

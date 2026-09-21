@@ -122,6 +122,7 @@ fun KhushhaalApp(
   val pillars by viewModel.pillars.collectAsStateWithLifecycle()
   val envelopes by viewModel.envelopes.collectAsStateWithLifecycle()
   val selectedSkill by viewModel.selectedSkill.collectAsStateWithLifecycle()
+  val availableSkills by viewModel.availableSkills.collectAsStateWithLifecycle()
   val roadmapSteps by viewModel.roadmapSteps.collectAsStateWithLifecycle()
   val isChallengeJoined by viewModel.isChallengeJoined.collectAsStateWithLifecycle()
   val emergencyDeposited by viewModel.emergencyDeposited.collectAsStateWithLifecycle()
@@ -250,7 +251,8 @@ fun KhushhaalApp(
                       onVoiceLogExpense = { viewModel.simulateVoiceLog() },
                       onRequestWageAdvance = { viewModel.requestWageAdvance() },
                       onPlayVoice = { caption, spoken -> viewModel.playVoice(caption, spoken) },
-                      onNavigateToDestination = { dest -> viewModel.navigateTo(dest) }
+                      onNavigateToDestination = { dest -> viewModel.navigateTo(dest) },
+                      factoryName = appConfigFactoryName
                     )
                   }
                   AppTab.PROSPERITY -> {
@@ -266,14 +268,15 @@ fun KhushhaalApp(
                   }
                   AppTab.EARN_MORE -> {
                     EarnMoreScreen(
-                      availableSkills = viewModel.availableSkills,
+                      availableSkills = availableSkills,
                       selectedSkill = selectedSkill,
                       roadmapSteps = roadmapSteps,
                       onSelectSkill = { skill -> viewModel.selectSkill(skill) },
                       onToggleRoadmapStep = { week -> viewModel.toggleRoadmapStep(week) },
                       onActivatePlan = { viewModel.orderMarketingKit() },
                       onPlayVoice = { caption, spoken -> viewModel.playVoice(caption, spoken) },
-                      onNavigateToDestination = { dest -> viewModel.navigateTo(dest) }
+                      onNavigateToDestination = { dest -> viewModel.navigateTo(dest) },
+                      factoryName = appConfigFactoryName
                     )
                   }
                 }
@@ -336,7 +339,8 @@ fun KhushhaalApp(
             messages = coachMessages,
             onBack = { viewModel.navigateBack() },
             onSendMessage = { text -> viewModel.sendCoachMessage(text) },
-            onPlayVoice = { c, s -> viewModel.playVoice(c, s) }
+            onPlayVoice = { c, s -> viewModel.playVoice(c, s) },
+            factoryName = appConfigFactoryName
           )
         }
 
@@ -387,7 +391,8 @@ fun KhushhaalApp(
             },
             onMarkAllRead = { viewModel.markAllNotificationsAsRead() },
             onClearAll = { viewModel.clearAllNotifications() },
-            onPlayVoice = { c, s -> viewModel.playVoice(c, s) }
+            onPlayVoice = { c, s -> viewModel.playVoice(c, s) },
+            factoryName = appConfigFactoryName
           )
         }
 
@@ -396,7 +401,8 @@ fun KhushhaalApp(
             payslip = payslip,
             onBack = { viewModel.navigateBack() },
             onShowToast = { msg -> viewModel.showToast(msg) },
-            onPlayVoice = { c, s -> viewModel.playVoice(c, s) }
+            onPlayVoice = { c, s -> viewModel.playVoice(c, s) },
+            factoryName = appConfigFactoryName
           )
         }
 

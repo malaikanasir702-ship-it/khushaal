@@ -15,16 +15,21 @@ const User = require('../models/User');
 const env = require('../config/env');
 
 const ADMIN_CREDENTIALS = {
-  name: 'Khushhaal Admin',
+  name: process.env.SEED_ADMIN_NAME || 'Khushhaal Admin',
   urduName: 'خوشحال ایڈمن',
-  phone: '+923001234567',
-  cnic: '35201-0000001-1',
+  phone: process.env.SEED_ADMIN_PHONE || '+923001234567',
+  cnic: process.env.SEED_ADMIN_CNIC || '35201-0000001-1',
   factory: 'Khushhaal Head Office',
   factoryId: 'KHQ-ADMIN-001',
-  password: 'Khushhaal@Admin2025!',
+  password: process.env.SEED_ADMIN_PASSWORD,
   role: 'admin',
   isActive: true
 };
+
+if (!ADMIN_CREDENTIALS.password) {
+  console.error('❌ SEED_ADMIN_PASSWORD is not set in .env. Aborting.');
+  process.exit(1);
+}
 
 async function seed() {
   try {
@@ -56,8 +61,8 @@ async function seed() {
     console.log('\n🎉 Super Admin created successfully!');
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     console.log(`   Phone:    ${ADMIN_CREDENTIALS.phone}`);
-    console.log(`   Password: ${ADMIN_CREDENTIALS.password}`);
-    console.log(`   URL:      https://khushaal-production.up.railway.app/admin/`);
+    console.log(`   Password: (as set in SEED_ADMIN_PASSWORD env var)`);
+    console.log(`   URL:      ${process.env.BACKEND_URL || 'https://your-deployment-url/admin/'}`);
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
     process.exit(0);
   } catch (error) {

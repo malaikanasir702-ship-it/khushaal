@@ -83,6 +83,7 @@ fun MoneyScreen(
   onPlayVoice: (String, String) -> Unit,
   modifier: Modifier = Modifier,
   onNavigateToDestination: (AppDestination) -> Unit = {},
+  factoryName: String = "Factory",
 ) {
   LazyColumn(
     modifier = modifier
@@ -134,7 +135,7 @@ fun MoneyScreen(
                   color = SlateTextPrimary
                 )
                 Text(
-                  text = "Naveena Mills Net Salary Credited",
+                  text = "$factoryName Net Salary Credited",
                   fontSize = 10.sp,
                   color = SlateTextSecondary
                 )
@@ -678,7 +679,7 @@ fun MoneyScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-              text = "سود اور مہنگے قرضے سے بچیں! Naveena Mills HR کے ذریعے Rs. 6,000 ایمرجنسی ایڈوانس بغیر سود دستیاب ہے۔",
+              text = "سود اور مہنگے قرضے سے بچیں! $factoryName HR کے ذریعے Rs. 6,000 ایمرجنسی ایڈوانس بغیر سود دستیاب ہے۔",
               fontSize = 12.sp,
               lineHeight = 18.sp,
               color = Color.White.copy(alpha = 0.85f)

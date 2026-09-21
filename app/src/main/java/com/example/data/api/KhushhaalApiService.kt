@@ -167,4 +167,8 @@ interface KhushhaalApiService {
     suspend fun sendCoachMessage(
         @Body message: SendMessageRequest
     ): Response<CoachMessageDto>
+
+    // --- Factory Payslip ---
+    @GET("api/payslip")
+    suspend fun getPayslip(): Response<PayslipDto?>
 }

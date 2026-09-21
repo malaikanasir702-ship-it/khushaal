@@ -1,5 +1,6 @@
 const express = require('express');
 const AppConfig = require('../models/AppConfig');
+const adminAuth = require('../middleware/adminAuth');
 
 const router = express.Router();
 
@@ -47,6 +48,33 @@ router.get('/', async (req, res) => {
   } catch (error) {
     console.error('Config fetch error:', error);
     return res.json(DEFAULT_CONFIG); // Always return something
+  }
+});
+
+// PUT /api/config — Admin-only: update app config
+router.put('/', adminAuth, async (req, res) => {
+  try {
+    const { factoryName, factoryUrdu, welfareHelpline, welfareHelplineLabel, rationItems, scamSimulations, skillOpportunities } = req.body;
+
+    let config = await AppConfig.findOne({ key: 'global' });
+    if (!config) {
+      config = new AppConfig({ key: 'global' });
+    }
+
+    if (factoryName !== undefined) config.factoryName = factoryName.trim();
+    if (factoryUrdu !== undefined) config.factoryUrdu = factoryUrdu.trim();
+    if (welfareHelpline !== undefined) config.welfareHelpline = welfareHelpline.trim();
+    if (welfareHelplineLabel !== undefined) config.welfareHelplineLabel = welfareHelplineLabel.trim();
+    if (rationItems !== undefined && Array.isArray(rationItems)) config.rationItems = rationItems;
+    if (scamSimulations !== undefined && Array.isArray(scamSimulations)) config.scamSimulations = scamSimulations;
+    if (skillOpportunities !== undefined && Array.isArray(skillOpportunities)) config.skillOpportunities = skillOpportunities;
+    config.updatedAt = new Date();
+
+    await config.save();
+    return res.json({ message: 'App config updated successfully', config });
+  } catch (error) {
+    console.error('Config update error:', error);
+    return res.status(500).json({ error: 'Error updating app config' });
   }
 });
 

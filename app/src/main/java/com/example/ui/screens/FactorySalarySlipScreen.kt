@@ -76,6 +76,7 @@ fun FactorySalarySlipScreen(
   onShowToast: (String) -> Unit,
   onPlayVoice: (String, String) -> Unit,
   modifier: Modifier = Modifier,
+  factoryName: String = "Factory",
 ) {
   Column(
     modifier = modifier
@@ -127,7 +128,7 @@ fun FactorySalarySlipScreen(
             .background(AmberLight)
             .clickable {
               onPlayVoice(
-                "Naveena Mills ki janib se aap ki kul aamdani 55,000 rupay bani ha. EOBI aur peshgi katoti ke baad 52,750 rupay JazzCash mein transfer ho chukay hain.",
+                "$factoryName ki janib se aap ki kul aamdani ${payslip.totalGrossWage.let { if (it > 0) "%,d".format(it) else "55,000" }} rupay bani ha. EOBI aur peshgi katoti ke baad ${payslip.netTakeHome.let { if (it > 0) "%,d".format(it) else "52,750" }} rupay JazzCash mein transfer ho chukay hain.",
                 "Aap ki factory payslip aur overtime tafseelat yahan mojood hain."
               )
             },
@@ -185,7 +186,7 @@ fun FactorySalarySlipScreen(
                     modifier = Modifier.size(16.dp)
                   )
                   Text(
-                    text = "NAVEENA TEXTILE MILLS LTD.",
+                    text = factoryName.uppercase(),
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,
                     color = AmberBrand,
@@ -516,7 +517,7 @@ fun FactorySalarySlipScreen(
           }
 
           Button(
-            onClick = { onShowToast("Naveena HR Wage Helpdesk: 021-35061400 (Ext: 204)") },
+            onClick = { onShowToast("$factoryName HR Wage Helpdesk — براہ کرم HR آفس سے رابطہ کریں") },
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(containerColor = SlateDarkBg),
             modifier = Modifier
