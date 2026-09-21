@@ -18,7 +18,7 @@ import { useAuth } from '../context/AuthContext';
 export const SystemHealthPage: React.FC = () => {
   const [health, setHealth] = useState<SystemHealth | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const { admin, demoMode, toggleDemoMode } = useAuth();
+  const { admin } = useAuth();
 
   const loadHealth = async () => {
     setLoading(true);
@@ -185,22 +185,22 @@ export const SystemHealthPage: React.FC = () => {
           <div className="border-b border-neutral-100 pb-3">
             <h3 className="text-sm font-bold text-neutral-900 uppercase flex items-center gap-2">
               <ShieldCheck className="w-4 h-4" />
-              <span>Data Source & Failover Settings</span>
+              <span>Platform Connection Status</span>
             </h3>
-            <p className="text-xs text-neutral-500">Switch between local simulated dataset and production MongoDB</p>
+            <p className="text-xs text-neutral-500">Live backend API and MongoDB Atlas connection details</p>
           </div>
 
           <div className="space-y-3 text-xs">
+            <div className="flex items-center gap-2 p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+              <span className="text-emerald-800 font-medium">Connected to Live MongoDB — All data is real</span>
+            </div>
             <p className="text-neutral-600 leading-relaxed">
-              When Demo Mode is active, all CRUD modifications (worker onboarding, transaction entries, utility bill payments) persist in-memory during your session without requiring an active local MongoDB daemon.
+              This admin console is connected directly to the production Railway backend. All CRUD operations (worker onboarding, transactions, bills, debts) are persisted to the live MongoDB Atlas database.
             </p>
-
-            <button
-              onClick={() => toggleDemoMode(!demoMode)}
-              className="w-full py-2.5 px-4 bg-neutral-900 hover:bg-neutral-800 text-white rounded-lg text-xs font-semibold transition-colors flex items-center justify-center gap-2"
-            >
-              <span>{demoMode ? 'Switch to Live MongoDB API' : 'Switch to Demo / Offline Mode'}</span>
-            </button>
+            <div className="p-3 bg-neutral-50 border border-neutral-200 rounded-lg font-mono text-[11px] text-neutral-600">
+              API: https://khushaal-production.up.railway.app/api/admin
+            </div>
           </div>
         </div>
       </div>
